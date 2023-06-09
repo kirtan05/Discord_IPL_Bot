@@ -1,0 +1,97 @@
+      indi=[]
+      indi2=[]
+      team=[]
+      name2=[]
+      name=[]
+      matches=[]
+      sirat=[]
+      runss=[]
+      sizeoftn=[]
+      import urllib.request, urllib.error, urllib.parse
+      url = 'https://www.sportskeeda.com/go/ipl/orange-cap?ref=carousel'
+      response = urllib.request.urlopen(url)
+      webc = response.read()
+      webc="".join(map(chr, webc))
+      #GET THE NAMES
+      for i in range(len(webc)):
+          if webc.startswith('<a href="/player/',i):
+              indi.append(i)
+      for i in indi:
+          i=i+20
+          found=0
+          flag=1
+          templ=[]
+          for i in range(i,i+30):
+              if(webc[i]=='>'):
+                  found=1
+              if(webc[i]=='<'):
+                 flag=0
+              if(found+flag==2):
+                  templ.append(webc[i])
+              if(flag==0):
+                  name.append(convertx(templ))
+                  break
+      #GET THE TEAMS
+      for i in range(len(webc)):
+          if webc.startswith('<a href="/team/',i):
+              indi2.append(i)
+      for i in indi2:
+          i=i+20
+          found=0
+          flag=1
+          templ=[]
+          for i in range(i,i+55):
+              if(webc[i]=='>'):
+                  found=1
+              if(webc[i]=='<'):
+                 flag=0
+              if(found+flag==2):
+                  templ.append(webc[i])
+              if(flag==0):
+                  sizeoftn.append(len(templ)-1)
+                  team.append(convertx(templ))
+                  break
+      #GET THE MATCHES PLAYED
+      for i in range(10):
+          indi2[i]+=139
+          indi2[i]=indi2[i]+sizeoftn[i]+sizeoftn[i]+sizeoftn[i]
+      for i in indi2:
+          templ=[]
+          flag=1
+          for i in range(i,i+12):
+              #print(webc[i],end="")
+              if(webc[i] >= '0' and webc[i] <= '9'):
+                  templ.append(webc[i])
+                  matches.append(convert(templ))
+                  break
+      #GET THE RUNS SCORED
+      for i in indi2:
+          templ=[]
+          i=i+105
+          for i in range(i+8,i+19):
+              if(webc[i] >= '0' and webc[i] <= '9'):
+                  templ.append(webc[i])
+          runss.append(convert(templ))
+              
+      #GET THE STRIKE RATE
+      for i in range(10):
+          indi2[i]=indi2[i]+140
+          x=indi2[i]
+      
+      for i in indi2:
+          templ=[]
+          for i in range(i,i+20):
+              if((webc[i] >= '0' and webc[i] <= '9') or webc[i]=='.'):
+                  templ.append(webc[i])
+          sirat.append(convert(templ))
+      purple=pd.DataFrame(columns=['SNo','Player Name','Team','No Of Matches','Runs Scored','Strike Rate'])
+      snoo=[]
+      for i in range(10):
+        snoo.append(i+1)
+      for i in name:
+          name2.append(converted(i))
+              
+      for i in range(10):
+        purple.loc[len(purple.index)]=[snoo[i],name2[i],team[i],matches[i],runss[i],sirat[i]]
+      blankIndex=[''] * len(purple)
+      purple.index=blankIndex
